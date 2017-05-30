@@ -5,85 +5,74 @@ namespace GuildedRose
 {
     public class GuildedRoseShop
     {
+        private const String Sulfuras = "Sulfuras, Hand of Ragnaros";
+        private const string BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
+        private const string AgedBrie = "Aged Brie";
         public IList<Item> Items;
 
         public void UpdateQuality()
         {
-            for (var i = 0; i < Items.Count; i++)
+            foreach (var item in Items)
             {
-                if (Items[i].Name != "Aged Brie" && Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
+                var name = item.Name;
+                var isNormalItem = IsNormalItem(name);
+
+                if (isNormalItem)
                 {
-                    if (Items[i].Quality > 0)
-                    {
-                        if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                        {
-                            Items[i].Quality = Items[i].Quality - 1;
-                        }
-                    }
+                    DecreaseQualityByItemQualityBy(item, 1);
+                    item.SellIn--;
+                    if (item.SellIn < 0)
+                        DecreaseQualityByItemQualityBy(item, 1);
                 }
-                else
+                else if (name == BackstagePasses)
                 {
-                    if (Items[i].Quality < 50)
-                    {
-                        Items[i].Quality = Items[i].Quality + 1;
-
-                        if (Items[i].Name == "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].SellIn < 11)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-
-                            if (Items[i].SellIn < 6)
-                            {
-                                if (Items[i].Quality < 50)
-                                {
-                                    Items[i].Quality = Items[i].Quality + 1;
-                                }
-                            }
-                        }
-                    }
-                }
-
-                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                {
-                    Items[i].SellIn = Items[i].SellIn - 1;
-                }
-
-                if (Items[i].SellIn < 0)
-                {
-                    if (Items[i].Name != "Aged Brie")
-                    {
-                        if (Items[i].Name != "Backstage passes to a TAFKAL80ETC concert")
-                        {
-                            if (Items[i].Quality > 0)
-                            {
-                                if (Items[i].Name != "Sulfuras, Hand of Ragnaros")
-                                {
-                                    Items[i].Quality = Items[i].Quality - 1;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            Items[i].Quality = Items[i].Quality - Items[i].Quality;
-                        }
-                    }
+                    if (item.SellIn < 6)
+                        IncreaseItemQualityBy(item, 3);
+                    else if (item.SellIn < 11)
+                        IncreaseItemQualityBy(item, 2);
                     else
-                    {
-                        if (Items[i].Quality < 50)
-                        {
-                            Items[i].Quality = Items[i].Quality + 1;
-                        }
-                    }
+                        IncreaseItemQualityBy(item, 1);
+
+                    item.SellIn--;
+
+                    if (item.SellIn < 0)
+                        item.Quality = 0;
+                }
+                else if (name == AgedBrie)
+                {
+                    IncreaseItemQualityBy(item, 1);
+
+                    item.SellIn--;
+
+                    if (item.SellIn < 0)
+                        IncreaseItemQualityBy(item, 1);
                 }
             }
         }
 
+        private void IncreaseItemQualityBy(Item item, Int32 value)
+        {
+            if (item.Quality + value > 50)
+                item.Quality = 50;
+            else
+                item.Quality += value;
+        }
+
+        private void DecreaseQualityByItemQualityBy(Item item, Int32 value)
+        {
+            if (item.Quality - value < 0)
+                item.Quality = 0;
+            else
+                item.Quality -= value;
+        }
+
+        private Boolean IsNormalItem(String name)
+        {
+            return name != Sulfuras && name != AgedBrie && name != BackstagePasses;
+        }
     }
+
+
 
     public class Item
     {

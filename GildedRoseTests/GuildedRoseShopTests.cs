@@ -45,7 +45,15 @@ namespace GuildedRoseTests
         }
 
         [TestMethod]
-        public void NormalItemWithZeroQualityRemainsAtZeroPerDay()
+        public void NormalItemPastSellInDateWithQualityOneDecreasesByOneAfterOneDay()
+        {
+            var updatedItem = CreateItemAndUpdate("Plain Joe's Dust Sword", 1, -1);
+
+            Assert.AreEqual(0, updatedItem.Quality);
+        }
+
+        [TestMethod]
+        public void NormalItemWithZeroQualityRemainsAtZero()
         {
             var updatedItem = CreateItemAndUpdate("Plain Joe's Cardboard Sword", 0, 15);
 
@@ -85,6 +93,14 @@ namespace GuildedRoseTests
         }
 
         [TestMethod]
+        public void AgedBrieAfterSellInDateWithQualityFortyNineIncreasesToFiftyAfterOneDay()
+        {
+            var updatedItem = CreateItemAndUpdate(AgedBrie, 49, -2);
+
+            Assert.AreEqual(50, updatedItem.Quality);
+        }
+
+        [TestMethod]
         public void SulfurasBeforeSellInDateQualityDoesNotChange()
         {
             var updatedItem = CreateItemAndUpdate(Sulfuras, 80, 10);
@@ -98,6 +114,14 @@ namespace GuildedRoseTests
             var updatedItem = CreateItemAndUpdate(Sulfuras, 80, -10);
 
             Assert.AreEqual(80, updatedItem.Quality);
+        }
+
+        [TestMethod]
+        public void SulfurasSellInDateDoesNotChange()
+        {
+            var updatedItem = CreateItemAndUpdate(Sulfuras, 80, -10);
+
+            Assert.AreEqual(-10, updatedItem.SellIn);
         }
 
         [TestMethod]
@@ -131,6 +155,23 @@ namespace GuildedRoseTests
 
             Assert.AreEqual(0, updatedItem.Quality);
         }
+
+        [TestMethod]
+        public void BackstagePassesWithSellInDateSevenWithQualityFortyNineIncreasesToFiftyAfterOneDay()
+        {
+            var updatedItem = CreateItemAndUpdate(BackstagePasses, 49, 7);
+
+            Assert.AreEqual(50, updatedItem.Quality);
+        }
+
+        [TestMethod]
+        public void BackstagePassesWithSellInDateThreeWithQualityFortyEightIncreasesToFiftyAfterOneDay()
+        {
+            var updatedItem = CreateItemAndUpdate(BackstagePasses, 48, 3);
+
+            Assert.AreEqual(50, updatedItem.Quality);
+        }
+
 
         [TestMethod]
         public void TwoNormalItemsBeforeSellInDateQualityDecreasesByOnePerDay()
