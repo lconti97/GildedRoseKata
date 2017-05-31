@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GildedRose
+namespace GildedRose.Items
 {
     public class BackstagePasses : Item
     {

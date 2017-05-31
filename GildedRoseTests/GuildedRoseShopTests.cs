@@ -1,8 +1,7 @@
 using GildedRose;
+using GildedRose.Items;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace GildedRoseTests
 {
@@ -25,7 +24,7 @@ namespace GildedRoseTests
         {
             var updatedItem = CreateAndUpdateNormalItem("Plain Joe's Sword", 10, 15);
          
-   Assert.AreEqual(9, updatedItem.Quality);
+            Assert.AreEqual(9, updatedItem.Quality);
         }
 
         [TestMethod]
@@ -228,8 +227,8 @@ namespace GildedRoseTests
             var itemName1 = "Joe's sword of noodliness";
             var itemName2 = "Mario's spicy meatball";
 
-            AddItemToShop(itemName1, 4, 10);
-            AddItemToShop(itemName2, 8, 11);
+            AddNormalItemToShop(itemName1, 4, 10);
+            AddNormalItemToShop(itemName2, 8, 11);
 
             guildedRoseShop.UpdateQuality();
 
@@ -258,16 +257,16 @@ namespace GildedRoseTests
 
         private Item CreateAndUpdateNormalItem(String name, Int32 quality, Int32 sellIn)
         {
-            AddItemToShop(name, quality, sellIn);
+            AddNormalItemToShop(name, quality, sellIn);
 
             guildedRoseShop.UpdateQuality();
 
             return guildedRoseShop.GetItem(name);
         }
 
-        private void AddItemToShop(String name, Int32 quality, Int32 sellIn)
+        private void AddNormalItemToShop(String name, Int32 quality, Int32 sellIn)
         {
-            var normalItem = new Item(name, quality, sellIn);
+            var normalItem = new NormalItem(name, quality, sellIn);
             guildedRoseShop.Add(normalItem);
         }
     }

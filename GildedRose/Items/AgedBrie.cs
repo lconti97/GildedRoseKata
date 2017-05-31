@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GildedRose
+namespace GildedRose.Items
 {
     public class AgedBrie : Item
     {
@@ -16,6 +16,5 @@ namespace GildedRose
 
             SellIn--;
         }
-
     }
 }
