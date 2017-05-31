@@ -1,10 +1,10 @@
-using GuildedRose;
+using GildedRose;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace GuildedRoseTests
+namespace GildedRoseTests
 {
     [TestClass]
     public class GuildedRoseShopTests
@@ -13,25 +13,25 @@ namespace GuildedRoseTests
         private const String AgedBrie = "Aged Brie";
         private const String BackstagePasses = "Backstage passes to a TAFKAL80ETC concert";
 
-        private GuildedRoseShop guildedRoseShop;
+        private GildedRoseShop guildedRoseShop;
         
         public GuildedRoseShopTests()
         {
-            guildedRoseShop = new GuildedRoseShop() { Items = new List<Item>() };
+            guildedRoseShop = new GildedRoseShop();
         }
 
         [TestMethod]
         public void NormalItemQualityDecreasesByOnePerDay()
         {
-            var updatedItem = CreateItemAndUpdate("Plain Joe's Sword", 10, 15);
-
-            Assert.AreEqual(9, updatedItem.Quality);
+            var updatedItem = CreateAndUpdateNormalItem("Plain Joe's Sword", 10, 15);
+         
+   Assert.AreEqual(9, updatedItem.Quality);
         }
 
         [TestMethod]
         public void NormalItemSellByDateDecreasesByOnePerDay()
         {
-            var updatedItem = CreateItemAndUpdate("Plain Joe's Sword", 10, 15);
+            var updatedItem = CreateAndUpdateNormalItem("Plain Joe's Sword", 10, 15);
 
             Assert.AreEqual(14, updatedItem.SellIn);
         }
@@ -39,7 +39,7 @@ namespace GuildedRoseTests
         [TestMethod]
         public void NormalItemPastSellInDateQualityDecreasesByTwoPerDay()
         {
-            var updatedItem = CreateItemAndUpdate("Plain Joe's Dusty Sword", 10, 0);
+            var updatedItem = CreateAndUpdateNormalItem("Plain Joe's Dusty Sword", 10, 0);
 
             Assert.AreEqual(8, updatedItem.Quality);
         }
@@ -47,7 +47,7 @@ namespace GuildedRoseTests
         [TestMethod]
         public void NormalItemPastSellInDateWithQualityOneDecreasesByOneAfterOneDay()
         {
-            var updatedItem = CreateItemAndUpdate("Plain Joe's Dust Sword", 1, -1);
+            var updatedItem = CreateAndUpdateNormalItem("Plain Joe's Dust Sword", 1, -1);
 
             Assert.AreEqual(0, updatedItem.Quality);
         }
@@ -55,7 +55,7 @@ namespace GuildedRoseTests
         [TestMethod]
         public void NormalItemWithZeroQualityRemainsAtZero()
         {
-            var updatedItem = CreateItemAndUpdate("Plain Joe's Cardboard Sword", 0, 15);
+            var updatedItem = CreateAndUpdateNormalItem("Plain Joe's Cardboard Sword", 0, 15);
 
             Assert.AreEqual(0, updatedItem.Quality);
         }
@@ -63,115 +63,164 @@ namespace GuildedRoseTests
         [TestMethod]
         public void AgedBrieBeforeSellInDateQualityIncreasesByOnePerDay()
         {
-            var updatedItem = CreateItemAndUpdate(AgedBrie, 10, 15);
+            var agedBrie = new AgedBrie(10, 15);
+            guildedRoseShop.Add(agedBrie);
 
-            Assert.AreEqual(11, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+            var changedBrie = guildedRoseShop.GetItem(AgedBrie);
+
+            Assert.AreEqual(11, changedBrie.Quality);
         }
          
         [TestMethod]
         public void AgedBrieAfterSellInDateQualityIncreasesByTwoPerDay()
         {
-            var updatedItem = CreateItemAndUpdate(AgedBrie, 10, 0);
+            var agedBrie = new AgedBrie(10, 0);
+            guildedRoseShop.Add(agedBrie);
 
-            Assert.AreEqual(12, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+            var updatedAgedBrie = guildedRoseShop.GetItem(AgedBrie);
+
+            Assert.AreEqual(12, updatedAgedBrie.Quality);
         }
 
         [TestMethod]
         public void AgedBrieBeforeSellInDateWithQualityFiftyDoesNotIncreaseInQuality()
         {
-            var updatedItem = CreateItemAndUpdate(AgedBrie, 50, 10);
+            var agedBrie = new AgedBrie(50, 10);
+            guildedRoseShop.Add(agedBrie);
 
-            Assert.AreEqual(50, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+            var updatedAgedBrie = guildedRoseShop.GetItem(AgedBrie);
+
+            Assert.AreEqual(50, updatedAgedBrie.Quality);
         }
 
         [TestMethod]
         public void AgedBrieAfterSellInDateQualityDoesNotIncreaseAboveFifty()
         {
-            var updatedItem = CreateItemAndUpdate(AgedBrie, 50, -2);
+            var agedBrie = new AgedBrie(50, -2);
+            guildedRoseShop.Add(agedBrie);
 
-            Assert.AreEqual(50, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+            var updatedAgedBrie = guildedRoseShop.GetItem(AgedBrie);
+
+            Assert.AreEqual(50, updatedAgedBrie.Quality);
         }
 
         [TestMethod]
         public void AgedBrieAfterSellInDateWithQualityFortyNineIncreasesToFiftyAfterOneDay()
         {
-            var updatedItem = CreateItemAndUpdate(AgedBrie, 49, -2);
+            var agedBrie = new AgedBrie(49, -2);
+            guildedRoseShop.Add(agedBrie);
 
-            Assert.AreEqual(50, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+            var updatedAgedBrie = guildedRoseShop.GetItem(AgedBrie);
+
+            Assert.AreEqual(50, updatedAgedBrie.Quality);
         }
 
         [TestMethod]
         public void SulfurasBeforeSellInDateQualityDoesNotChange()
         {
-            var updatedItem = CreateItemAndUpdate(Sulfuras, 80, 10);
+            var sulfuras = new Sulfuras();
+            guildedRoseShop.Add(sulfuras);
 
-            Assert.AreEqual(80, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedSulfuras = guildedRoseShop.GetItem(Sulfuras);
+            Assert.AreEqual(80, updatedSulfuras.Quality);
         }
 
         [TestMethod]
         public void SulfurasAfterSellInDateQualityDoesNotChange()
         {
-            var updatedItem = CreateItemAndUpdate(Sulfuras, 80, -10);
+            var sulfuras = new Sulfuras();
+            guildedRoseShop.Add(sulfuras);
 
-            Assert.AreEqual(80, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedSulfuras = guildedRoseShop.GetItem(Sulfuras);
+            Assert.AreEqual(80, updatedSulfuras.Quality);
         }
 
         [TestMethod]
-        public void SulfurasSellInDateDoesNotChange()
+        public void SulfurasSellInDateIsZero()
         {
-            var updatedItem = CreateItemAndUpdate(Sulfuras, 80, -10);
+            var sulfuras = new Sulfuras();
+            guildedRoseShop.Add(sulfuras);
 
-            Assert.AreEqual(-10, updatedItem.SellIn);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedSulfuras = guildedRoseShop.GetItem(Sulfuras);
+            Assert.AreEqual(0, updatedSulfuras.SellIn);
         }
 
         [TestMethod]
         public void BackstagePassesMoreThanTenDaysBeforeSellInDateQualityIncreasesByOnePerDay()
         {
-            var updatedItem = CreateItemAndUpdate(BackstagePasses, 20, 15);
+            var backstagePasses = new BackstagePasses(20, 15);
+            guildedRoseShop.Add(backstagePasses);
 
-            Assert.AreEqual(21, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedBackstagePasses = guildedRoseShop.GetItem(BackstagePasses);
+            Assert.AreEqual(21, updatedBackstagePasses.Quality);
         }
 
         [TestMethod]
         public void BackstagePassesBetweenTenAndSixDaysInclusivelyBeforeSellInDateQualityIncreasesByTwoPerDay()
         {
-            AddItemToShop(BackstagePasses, 20, 10);
+            var backstagePasses = new BackstagePasses(20, 10);
+            guildedRoseShop.Add(backstagePasses);
 
-            AssertItemQualityIncreasesByGivenIntervalInInclusiveRange(2, 10, 6);
+            AssertItemQualityIncreasesByGivenIntervalInInclusiveRange(backstagePasses, 2, 10, 6);
         }
 
         [TestMethod]
         public void BackstagePassesBetweenFiveAndOneDaysInclusivelyBeforeSellInDateQualityIncreasesByThreePerDay()
         {
-            AddItemToShop(BackstagePasses, 20, 5);
+            var backstagePasses = new BackstagePasses(20, 5);
+            guildedRoseShop.Add(backstagePasses);
 
-            AssertItemQualityIncreasesByGivenIntervalInInclusiveRange(3, 5, 1);
+            AssertItemQualityIncreasesByGivenIntervalInInclusiveRange(backstagePasses, 3, 5, 1);
         }
 
         [TestMethod]
         public void BackstagePassesAfterSellInDateQualityIsZero()
         {
-            var updatedItem = CreateItemAndUpdate(BackstagePasses, 20, 0);
+            var backstagePasses = new BackstagePasses(20, 0);
+            guildedRoseShop.Add(backstagePasses);
 
-            Assert.AreEqual(0, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedBackstagePasses = guildedRoseShop.GetItem(BackstagePasses);
+            Assert.AreEqual(0, updatedBackstagePasses.Quality);
         }
 
         [TestMethod]
         public void BackstagePassesWithSellInDateSevenWithQualityFortyNineIncreasesToFiftyAfterOneDay()
         {
-            var updatedItem = CreateItemAndUpdate(BackstagePasses, 49, 7);
+            var backstagePasses = new BackstagePasses(49, 7);
+            guildedRoseShop.Add(backstagePasses);
 
-            Assert.AreEqual(50, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedBackstagePasses = guildedRoseShop.GetItem(BackstagePasses);
+            Assert.AreEqual(50, updatedBackstagePasses.Quality);
         }
 
         [TestMethod]
         public void BackstagePassesWithSellInDateThreeWithQualityFortyEightIncreasesToFiftyAfterOneDay()
         {
-            var updatedItem = CreateItemAndUpdate(BackstagePasses, 48, 3);
+            var backstagePasses = new BackstagePasses(48, 3);
+            guildedRoseShop.Add(backstagePasses);
 
-            Assert.AreEqual(50, updatedItem.Quality);
+            guildedRoseShop.UpdateQuality();
+
+            var updatedBackstagePasses = guildedRoseShop.GetItem(BackstagePasses);
+            Assert.AreEqual(50, updatedBackstagePasses.Quality);
         }
-
 
         [TestMethod]
         public void TwoNormalItemsBeforeSellInDateQualityDecreasesByOnePerDay()
@@ -184,45 +233,42 @@ namespace GuildedRoseTests
 
             guildedRoseShop.UpdateQuality();
 
-            var updatedItem1 = GetItemFromShop(itemName1);
-            var updatedItem2 = GetItemFromShop(itemName2);
+            var updatedItem1 = guildedRoseShop.GetItem(itemName1);
+            var updatedItem2 = guildedRoseShop.GetItem(itemName2);
 
             Assert.AreEqual(3, updatedItem1.Quality);
             Assert.AreEqual(7, updatedItem2.Quality);
         }
 
-        private Item GetItemFromShop(String name)
+        private void AssertItemQualityIncreasesByGivenIntervalInInclusiveRange(Item item, Int32 qualityInterval, Int32 startSellInDate, Int32 endSellInDate)
         {
-            return guildedRoseShop.Items.First(i => i.Name == name);
-        }
-
-        private void AssertItemQualityIncreasesByGivenIntervalInInclusiveRange(Int32 qualityInterval, Int32 startSellInDate, Int32 endSellInDate)
-        {
-            var expected = guildedRoseShop.Items[0].Quality;
+            var itemName = item.Name;
+            var expected = item.Quality;
             var daysToRun = startSellInDate - endSellInDate + 1;
 
             for (var i = 0; i < daysToRun; i++)
             {
                 guildedRoseShop.UpdateQuality();
                 expected += qualityInterval;
-                var actual = guildedRoseShop.Items[0].Quality;
+                var updatedItem = guildedRoseShop.GetItem(itemName);
+                var actual = updatedItem.Quality;
                 Assert.AreEqual(expected, actual);
             }
         }
 
-        private Item CreateItemAndUpdate(String name, Int32 quality, Int32 sellIn)
+        private Item CreateAndUpdateNormalItem(String name, Int32 quality, Int32 sellIn)
         {
             AddItemToShop(name, quality, sellIn);
 
             guildedRoseShop.UpdateQuality();
 
-            return GetItemFromShop(name);
+            return guildedRoseShop.GetItem(name);
         }
 
         private void AddItemToShop(String name, Int32 quality, Int32 sellIn)
         {
-            var normalItem = new Item { Name = name, Quality = quality, SellIn = sellIn };
-            guildedRoseShop.Items.Add(normalItem);
+            var normalItem = new Item(name, quality, sellIn);
+            guildedRoseShop.Add(normalItem);
         }
     }
 }
